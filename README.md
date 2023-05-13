@@ -12,6 +12,8 @@ Mysterious realm where your files live.
 
 ## Things we want to be able to do and how to achieve them
 
+- cli
+    - get there when we get there
 - create the nthr
     - set up filesystem
         - create directory if it doesn't exist
