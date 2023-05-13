@@ -10,6 +10,26 @@ The entrance to the NTHR.
 
 Mysterious realm where your files live.
 
+## Usage
+
+`nthr create`
+
+`nthr start`
+
+`nthr stop`
+
+`nthr status`
+
+`nthr prtl to <nthr_location>`
+
+`nthr prtl start`
+
+`nthr prtl stop`
+
+`nthr prtl ping [<nthr_location>]`
+
+`nthr prtl status`
+
 ## Things we want to be able to do and how to achieve them
 
 - cli
