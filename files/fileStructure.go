@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 type FileStructure struct {
@@ -105,41 +104,62 @@ func (f *Folder) write(prefix string) error {
 }
 
 func (f *Folder) fill(path string) error {
-	return filepath.WalkDir(path, func(pth string, d fs.DirEntry, directoryErr error) error {
-		if directoryErr != nil {
-			log.Fatal("Problem walking directory ", path)
-			return directoryErr
-		}
-		if path == pth {
-			f.Name = d.Name()
-			return nil
-		}
-		if d.IsDir() {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		log.Fatal("Error parsing dir", path)
+	}
+
+	for _, file := range files {
+		if file.IsDir() {
 			thisFolder := &Folder{
+				Name:    file.Name(),
 				Files:   []File{},
 				Folders: []*Folder{},
 			}
-			err := thisFolder.fill(path + "/" + d.Name())
-			thisFolder.Name = d.Name()
-			if err != nil {
-				log.Fatal("Could not parse directory: ", path)
-				return err
-			}
+			thisFolder.fill(path + "/" + file.Name())
 			f.Folders = append(f.Folders, thisFolder)
 		} else {
-			info, err := d.Info()
-			if err != nil {
-				log.Fatalf("Problem with file %s in directory %s", d.Name(), path)
-				return err
-			}
-			f.Files = append(f.Files, File{d.Name(), info})
+			info, _ := file.Info()
+			f.Files = append(f.Files, File{
+				Name: file.Name(),
+				Info: info,
+			})
 		}
-
-		return nil
-	})
+	}
+	return nil
 }
 
-func (f *FileStructure) display() {
+//
+//func (f *Folder) fill(path string) error {
+//	return filepath.Walk(path, func(pth string, info fs.FileInfo, directoryErr error) error {
+//		if directoryErr != nil {
+//			log.Fatal("Problem walking directory ", path)
+//			return directoryErr
+//		}
+//		if path == pth {
+//			f.Name = info.Name()
+//			return nil
+//		}
+//		if info.IsDir() {
+//			thisFolder := &Folder{
+//				Files:   []File{},
+//				Folders: []*Folder{},
+//			}
+//			err := thisFolder.fill(path + "/" + info.Name())
+//			thisFolder.Name = info.Name()
+//			if err != nil {
+//				log.Fatal("Could not parse directory: ", path)
+//				return err
+//			}
+//			f.Folders = append(f.Folders, thisFolder)
+//		} else {
+//			f.Files = append(f.Files, File{info.Name(), info})
+//		}
+//		return nil
+//	})
+//}
+
+func (f *FileStructure) Display() {
 	fmt.Printf("Filestructure: \n-%v/\n", f.Path)
 	f.Root.display(1)
 }
