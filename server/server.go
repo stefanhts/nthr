@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"nthr/files"
@@ -18,8 +19,14 @@ type Server struct {
 func Start() {
 	port := ":3000"
 	mux := http.NewServeMux()
+
 	mux.HandleFunc("/sync", checkSync)
-	http.ListenAndServe(port, mux)
+	mux.HandleFunc("/upload", downloadFile)
+
+	err := http.ListenAndServe(port, mux)
+	if err != nil {
+		log.Fatal("Server failed")
+	}
 }
 
 func checkSync(w http.ResponseWriter, r *http.Request) {
@@ -46,4 +53,10 @@ func checkSync(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+}
+
+func downloadFile(w http.ResponseWriter, r *http.Request) {
+	b, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	fmt.Println(string(b))
 }

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"nthr/files"
+	"os"
 )
 
 func main() {
@@ -29,4 +30,24 @@ func main() {
 	b, _ := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	fmt.Println(string(b))
+	sendFile("tempdir/bleh")
+}
+
+func sendFile(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal("Could not load ", path)
+	}
+	msg := files.FileMessage{
+		Key:  path,
+		File: file,
+	}
+	toSend, err := json.Marshal(msg)
+	res, err := http.Post("http://127.0.0.1:3000/upload", "application/json", bytes.NewBuffer(toSend))
+	b, _ := ioutil.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil {
+		log.Fatal("Could not create request")
+	}
+	fmt.Printf("response code: ", string(b))
 }
