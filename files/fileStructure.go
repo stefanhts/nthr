@@ -129,36 +129,6 @@ func (f *Folder) fill(path string) error {
 	return nil
 }
 
-//
-//func (f *Folder) fill(path string) error {
-//	return filepath.Walk(path, func(pth string, info fs.FileInfo, directoryErr error) error {
-//		if directoryErr != nil {
-//			log.Fatal("Problem walking directory ", path)
-//			return directoryErr
-//		}
-//		if path == pth {
-//			f.Name = info.Name()
-//			return nil
-//		}
-//		if info.IsDir() {
-//			thisFolder := &Folder{
-//				Files:   []File{},
-//				Folders: []*Folder{},
-//			}
-//			err := thisFolder.fill(path + "/" + info.Name())
-//			thisFolder.Name = info.Name()
-//			if err != nil {
-//				log.Fatal("Could not parse directory: ", path)
-//				return err
-//			}
-//			f.Folders = append(f.Folders, thisFolder)
-//		} else {
-//			f.Files = append(f.Files, File{info.Name(), info})
-//		}
-//		return nil
-//	})
-//}
-
 func (f *FileStructure) Display() {
 	fmt.Printf("Filestructure: \n-%v/\n", f.Path)
 	f.Root.display(1)
@@ -178,40 +148,43 @@ func (f *Folder) display(indent int) {
 	}
 }
 
-func (f *FileStructure) stringify() string {
-	out := fmt.Sprintf("%v", f.Path)
-	out += f.Root.stringify(0)
+func (f *FileStructure) Stringify() string {
+	out := "" //fmt.Sprintf("%v", f.Path)
+	out += f.Root.stringify("")
 	return out
 }
 
-func (f *Folder) stringify(level int) string {
-	prefix := ""
-	out := ""
-	for i := 0; i < level; i++ {
-		prefix += "`"
-	}
+func (f *Folder) stringify(prefix string) string {
+    prefix = prefix + "/" + f.Name
+	out := "\n" + prefix
 	for _, folder := range f.Folders {
-		out += fmt.Sprintf("%s%s/", prefix, folder.Name)
-		out += folder.stringify(level + 1)
+		//out += fmt.Sprintf("\n%s%s/", prefix, folder.Name)
+		out += folder.stringify(prefix)
 	}
 	for _, file := range f.Files {
-		out += file.stringify()
+		out += file.stringify(prefix)
 	}
 	return out
 }
 
-func (f *File) stringify() string {
-	return fmt.Sprintf("%s%d", f.Name, f.Info.Size())
+func (f *File) stringify(prefix string) string {
+    return fmt.Sprintf(
+        "\n%s/%s : %d : %d",
+        prefix,
+        f.Name,
+        f.Info.Size(),
+        f.Info.ModTime().Unix(),
+    )
 }
 
 func (f *Folder) Hash() string {
-	return Hash(f.stringify(0))
+	return Hash(f.stringify(""))
 }
 
 func (f *File) Hash() string {
-	return Hash(f.stringify())
+	return Hash(f.stringify(""))
 }
 
 func (f *FileStructure) Hash() string {
-	return Hash(f.stringify())
+	return Hash(f.Stringify())
 }
