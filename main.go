@@ -1,9 +1,12 @@
 package main
 
 import (
-	"nthr/server"
+	"nthr/files"
 )
 
 func main() {
-	server.Start()
+	fs := files.GetFileStructure("tempdir")
+	fs.Display()
+
+	//server.Start()
 }
