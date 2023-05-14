@@ -1,8 +1,11 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"nthr/files"
 )
 
 type Server struct {
@@ -13,24 +16,34 @@ type Server struct {
 }
 
 func Start() {
-	server := &Server{
-		port:      ":3000",
-		mux:       http.NewServeMux(),
-		endpoints: []string{"/"},
-		handlers:  []func(w http.ResponseWriter, r *http.Request){handleRequest},
-	}
-
-	server.bindEndpoints()
-	http.ListenAndServe(server.port, server.mux)
+	port := ":3000"
+	mux := http.NewServeMux()
+	mux.HandleFunc("/sync", checkSync)
+	http.ListenAndServe(port, mux)
 }
 
-func (s *Server) bindEndpoints() {
-	for i, _ := range s.endpoints {
-		s.mux.HandleFunc(s.endpoints[i], s.handlers[i])
-	}
-}
+func checkSync(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		decoder := json.NewDecoder(r.Body)
+		sm := files.SyncMessage{}
+		err := decoder.Decode(&sm)
 
-func handleRequest(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "The server is live")
-	fmt.Printf("Request made to: %s\n", r.URL)
+		if err != nil {
+			log.Fatal("could not decode request")
+			return
+		}
+		fs := files.GetFileStructure(sm.Path)
+
+		if sm.Hash == fs.Hash() {
+			_, err := fmt.Fprintf(w, "File structure matches")
+			if err != nil {
+				return
+			}
+		} else {
+			_, err := fmt.Fprintf(w, "file structure hashes conflict")
+			if err != nil {
+				return
+			}
+		}
+	}
 }

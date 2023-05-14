@@ -1,6 +1,8 @@
 package main
 
-import "nthr/server"
+import (
+	"nthr/server"
+)
 
 func main() {
 	server.Start()
