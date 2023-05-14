@@ -55,6 +55,7 @@ func Hash(str string) string {
 func GetFileStructure(path string) *FileStructure {
 	fileStructure := &FileStructure{
 		Root: &Folder{
+            Name:    path,
 			Files:   []File{},
 			Folders: []*Folder{},
 		},

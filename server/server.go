@@ -59,10 +59,10 @@ func fileDiff(w http.ResponseWriter, r *http.Request) {
             return
         }
         fs := files.GetFileStructure(dm.Path)
-        fs.Display()
         serverSideFiles := fs.Stringify()
         clientSideFiles := dm.Structure
         fmt.Printf("server side files:\n%s\n\n", serverSideFiles)
         fmt.Printf("client side files:\n%s\n", clientSideFiles)
+        // TODO: find differences between these 
     }
 }
