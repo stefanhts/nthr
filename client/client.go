@@ -11,9 +11,8 @@ import (
 )
 
 func main() {
-	path := "testDir"
+	path := "tempDir"
 	fs := files.GetFileStructure(path)
-
 	sm := files.SyncMessage{
 		Hash: fs.Hash(),
 		Path: path,
