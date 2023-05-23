@@ -2,6 +2,9 @@
 
 A source of truth file syncing service which supports personal deployment and file storage
 
+## TODO
+[trello board](https://trello.com/invite/b/ncg3sbZt/ATTIbf6d93b6729b8f05562c1ad46403398805B8DB4A/nthr)
+
 ## The PRTL
 
 The entrance to the NTHR.
